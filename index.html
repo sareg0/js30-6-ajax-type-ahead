@@ -37,23 +37,30 @@ function filterResults (searchString) {
   let word = searchString.toLowerCase()
   let regexOfWord = new RegExp(word, 'gi')
   return fullCities.filter(item => {
-    return item.city.match(regexOfWord)
+    return item.city.match(regexOfWord) || item.state.match(regexOfWord)
   })
 }
 
-function clearEntries (element) {
-  element.innerHTML = ''
+function numberWithCommas(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
+
 
 function autocomplete () {
   let filteredCities = filterResults(inputEl.value)
-  clearEntries(suggestions)
-  filteredCities.forEach((city) => {
-    let newItem = document.createElement("li")
-    newItem.innerHTML = `${city.city}<span>${city.population}</span>`
-    suggestions.appendChild(newItem)
-  })
-  console.log(filteredCities)
+  const html = filteredCities.map(place => {
+    let regex = new RegExp(inputEl.value, 'gi')
+    let cityName = place.city.replace(regex, `<span class="hl">${inputEl.value}</span>`)
+    let stateName = place.state.replace(regex, `<span class="hl">${inputEl.value}</span>`)
+    return `
+      <li>
+        <span class="name">${cityName}, ${stateName}</span>
+        <span class="population">${numberWithCommas(place.population)}</span>
+      </li>
+    `
+  }).join("")
+  suggestions.innerHTML = html
+  console.log(html)
 }
 
 </script>
